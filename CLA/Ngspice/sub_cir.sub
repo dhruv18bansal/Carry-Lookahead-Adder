@@ -1,0 +1,110 @@
+.subckt inv y x vdd gnd width_N=width width_P=2*width
+
+M1 y x vdd vdd CMOSP W={width_P} L={2*LAMBDA}
++ AS={5*width_P*LAMBDA} PS={10*LAMBDA+2*width_P} 
++ AD={5*width_P*LAMBDA} PD={10*LAMBDA+2*width_P}
+
+M2 y x gnd gnd CMOSN W={width_N} L={2*LAMBDA}
++ AS={5*width_N*LAMBDA} PS={10*LAMBDA+2*width_N} 
++ AD={5*width_N*LAMBDA} PD={10*LAMBDA+2*width_N}
+
+.ends inv
+
+* 2-input OR gate using CVSL
+* 2-input OR gate using pull-up and pull-down networks
+.subckt or2 out a b vdd gnd width_N=width width_P=4*width
+
+* Pull-up network
+* drain gate source body
+M3 out1 a vdd vdd CMOSP W={width_P} L={2*LAMBDA}
++ AS={5*width_P*LAMBDA} PS={10*LAMBDA+2*width_P} 
++ AD={5*width_P*LAMBDA} PD={10*LAMBDA+2*width_P}
+M4 out_not b out1 vdd CMOSP W={width_P} L={2*LAMBDA}
++ AS={5*width_P*LAMBDA} PS={10*LAMBDA+2*width_P} 
++ AD={5*width_P*LAMBDA} PD={10*LAMBDA+2*width_P}
+
+* Pull-down network
+M5 out_not a gnd gnd CMOSN W={width_N} L={2*LAMBDA}
++ AS={5*width_N*LAMBDA} PS={10*LAMBDA+2*width_N} 
++ AD={5*width_N*LAMBDA} PD={10*LAMBDA+2*width_N}
+M6 out_not b gnd gnd CMOSN W={width_N} L={2*LAMBDA}
++ AS={5*width_N*LAMBDA} PS={10*LAMBDA+2*width_N} 
++ AD={5*width_N*LAMBDA} PD={10*LAMBDA+2*width_N}
+ 
+Xinv1 out out_not vdd gnd inv
+
+.ends or2
+
+.subckt and2 out a b vdd gnd width_N=2*width width_P=2*width
+
+* Pull-up network
+* drain gate source body
+M3 out_not a vdd vdd CMOSP W={width_P} L={2*LAMBDA}
++ AS={5*width_P*LAMBDA} PS={10*LAMBDA+2*width_P} 
++ AD={5*width_P*LAMBDA} PD={10*LAMBDA+2*width_P}
+M4 out_not b vdd vdd CMOSP W={width_P} L={2*LAMBDA}
++ AS={5*width_P*LAMBDA} PS={10*LAMBDA+2*width_P} 
++ AD={5*width_P*LAMBDA} PD={10*LAMBDA+2*width_P}
+
+* Pull-down network
+M5 d1 a gnd gnd CMOSN W={width_N} L={2*LAMBDA}
++ AS={5*width_N*LAMBDA} PS={10*LAMBDA+2*width_N} 
++ AD={5*width_N*LAMBDA} PD={10*LAMBDA+2*width_N}
+M6 out_not b d1 gnd CMOSN W={width_N} L={2*LAMBDA}
++ AS={5*width_N*LAMBDA} PS={10*LAMBDA+2*width_N} 
++ AD={5*width_N*LAMBDA} PD={10*LAMBDA+2*width_N}
+ 
+Xinv1 out out_not vdd gnd inv
+
+.ends and2
+
+.subckt and3 out a b c vdd gnd
+X1 w a b vdd gnd and2
+X2 out w c vdd gnd and2
+.ends and3
+
+.subckt or3 out a b c vdd gnd
+X1 w a b vdd gnd or2
+X2 out w c vdd gnd or2
+.ends or3
+
+.subckt and4 out a b c d vdd gnd
+X1 w a b vdd gnd and2
+X2 x c d vdd gnd and2
+X3 out w x vdd gnd and2
+.ends and4
+
+.subckt or4 out a b c d vdd gnd
+X1 w a b vdd gnd or2
+X2 x c d vdd gnd or2
+X3 out w x vdd gnd or2
+.ends or4
+
+.subckt and5 out a b c d e vdd gnd
+X1 w a b vdd gnd and2
+X2 x c d vdd gnd and2
+X3 y w x vdd gnd and2
+X4 out y e vdd gnd and2
+.ends and5
+
+.subckt or5 out a b c d e vdd gnd
+X1 w a b vdd gnd or2
+X2 x c d vdd gnd or2
+X3 y w x vdd gnd or2
+X4 out y e vdd gnd or2
+.ends or5
+
+.subckt xor Y A B vdd gnd width_N=width
+x1 Anot A vdd gnd inv
+x2 Bnot B vdd gnd inv
+
+M3 B A xf gnd CMOSN W={width_N} L={2*LAMBDA}
++ AS={5*width_N*LAMBDA} PS={10*LAMBDA+2*width_N} 
++ AD={5*width_N*LAMBDA} PD={10*LAMBDA+2*width_N}
+
+M4 Bnot Anot xf gnd CMOSN W={width_N} L={2*LAMBDA}
++ AS={5*width_N*LAMBDA} PS={10*LAMBDA+2*width_N} 
++ AD={5*width_N*LAMBDA} PD={10*LAMBDA+2*width_N}
+
+x3 Y xf vdd gnd inv 
+.ends xor

@@ -1,0 +1,77 @@
+
+.include TSMC_180nm.txt
+.include sub_cir.sub
+
+.param LAMBDA=0.09u
+.param SUPPLY=1.8
+.param width=1.8u
+.global gnd vdd
+
+* here we are implementing carry look ahead adders using multiple xor and and gates
+VDD vdd gnd 'SUPPLY'
+VA0 A0 gnd pulse(0 1.8 5n 0 0 5n 10n)
+VA1 A1 gnd pulse(0 1.8 5n 0 0 5n 10n)
+VA2 A2 gnd pulse(0 1.8 5n 0 0 5n 10n)
+VA3 A3 gnd pulse(0 1.8 5n 0 0 5n 10n)
+
+VB0 B0 gnd pulse(0 1.8 5n 0 0 5n 10n)
+VB1 B1 gnd pulse(0 1.8 5n 0 0 5n 10n)
+VB2 B2 gnd pulse(0 1.8 5n 0 0 5n 10n)
+VB3 B3 gnd pulse(0 1.8 5n 0 0 5n 10n)
+
+VC0 C0 gnd pulse(0 1.8 5n 0 0 5n 10n)
+
+* inputs A0A1A2A3 B0B1B2B3
+* finding Pi's for each bit
+x1 P0 A0 B0 vdd gnd xor
+x2 P1 A1 B1 vdd gnd xor
+x3 P2 A2 B2 vdd gnd xor
+x4 P3 A3 B3 vdd gnd xor
+
+* finding Gi's for each bit
+x5 G0 A0 B0 vdd gnd and2
+x6 G1 A1 B1 vdd gnd and2
+x7 G2 A2 B2 vdd gnd and2
+x8 G3 A3 B3 vdd gnd and2
+
+* finding Ci's for each bit
+x9 a1 P0 C0 vdd gnd and2
+x10 C1 G0 a1 vdd gnd or2
+x11 a2_1 P1 P0 C0 vdd gnd and3
+x12 a2_2 P1 G0 vdd gnd and2
+x13 C2 G1 a2_1 a2_2 vdd gnd or3
+x14 a3_1 P2 P1 P0 C0 vdd gnd and4
+x15 a3_2 P2 P1 G0 vdd gnd and3
+x16 a3_3 P2 G1 vdd gnd and2
+x17 C3 G2 a3_1 a3_2 a3_3 vdd gnd or4
+x18 a4_1 P3 P2 P1 P0 C0 vdd gnd and5
+x19 a4_2 P3 P2 P1 G0 vdd gnd and4
+x20 a4_3 P3 P2 G1 vdd gnd and3
+x21 a4_4 P3 G2 vdd gnd and2
+x22 C4 G3 a4_1 a4_2 a4_3 a4_4 vdd gnd or5
+
+* finding Si's for each bit
+x17 S0 P0 C0 vdd gnd xor
+x18 S1 P1 C1 vdd gnd xor
+x19 S2 P2 C2 vdd gnd xor
+x20 S3 P3 C3 vdd gnd xor
+
+.tran 0.01n 10n
+
+.control
+set hcopypscolor = 1
+set color0=white
+set color1=black
+run
+set curplottitle="Dhruv Bansal (2023102048)"
+plot v(S0) 2+V(S1) 4+V(S2) 6+V(S3) 8+V(C4)
+
+.endc
+
+
+
+
+
+
+
+

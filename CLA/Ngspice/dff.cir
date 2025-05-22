@@ -1,0 +1,29 @@
+.subckt flipflop Q2 d clk  vdd gnd
+.param width_P=20*LAMBDA width_N=10*LAMBDA
+M1 y1 d vdd vdd CMOSP W={width_P} L={2*LAMBDA} AS={5*width_P*LAMBDA}
++ PS={10*LAMBDA+2*width_P} AD={5*width_P*LAMBDA} PD={10*LAMBDA+2*width_P}
+M2 d1 clk y1 vdd CMOSP W={width_P} L={2*LAMBDA} AS={5*width_P*LAMBDA}
++ PS={10*LAMBDA+2*width_P} AD={5*width_P*LAMBDA} PD={10*LAMBDA+2*width_P}
+M3 d1 d gnd gnd CMOSN W={width_N} L={2*LAMBDA} AS={5*width_N*LAMBDA}
++ PS={10*LAMBDA+2*width_N} AD={5*width_N*LAMBDA} PD={10*LAMBDA+2*width_N}
+
+M4 d2 clk vdd vdd CMOSP W={width_P} L={2*LAMBDA} AS={5*width_P*LAMBDA}
++ PS={10*LAMBDA+2*width_P} AD={5*width_P*LAMBDA} PD={10*LAMBDA+2*width_P}
+M5 d2 d1 y2 gnd CMOSN W={width_N} L={2*LAMBDA} AS={5*width_N*LAMBDA}
++ PS={10*LAMBDA+2*width_N} AD={5*width_N*LAMBDA} PD={10*LAMBDA+2*width_N}
+M6 y2 clk gnd gnd CMOSN W={width_N} L={2*LAMBDA} AS={5*width_N*LAMBDA}
++ PS={10*LAMBDA+2*width_N} AD={5*width_N*LAMBDA} PD={10*LAMBDA+2*width_N}
+
+M7 Q d2 vdd vdd CMOSP W={width_P} L={2*LAMBDA} AS={5*width_P*LAMBDA}
++ PS={10*LAMBDA+2*width_P} AD={5*width_P*LAMBDA} PD={10*LAMBDA+2*width_P}
+M8 Q clk y3 gnd CMOSN W={width_N} L={2*LAMBDA} AS={5*width_N*LAMBDA}
++ PS={10*LAMBDA+2*width_N} AD={5*width_N*LAMBDA} PD={10*LAMBDA+2*width_N}
+M9 y3 d2 gnd gnd CMOSN W={width_N} L={2*LAMBDA} AS={5*width_N*LAMBDA}
++ PS={10*LAMBDA+2*width_N} AD={5*width_N*LAMBDA} PD={10*LAMBDA+2*width_N}
+
+Xinv201  Q Q_not vdd gnd not
+Xinv202 Q_not Q1 vdd gnd not
+Xinv203 Q1 Q2 vdd gnd not
+* Xinv2 Q_not1 Q_not2 vdd gnd not
+.ends flipflop
+

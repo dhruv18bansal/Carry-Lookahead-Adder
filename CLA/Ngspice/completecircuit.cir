@@ -1,0 +1,93 @@
+
+.include TSMC_180nm.txt
+.include sub_cir.sub
+
+.param LAMBDA=0.09u
+.param SUPPLY=1.8
+.param width=1.8u
+.global gnd vdd
+
+* here we are implementing carry look ahead adders using multiple xor and and gates
+VDD vdd gnd 'SUPPLY'
+Vclk clk gnd pulse(1.8 0 0 0 0 5n 10n)
+VA0 A0 gnd pulse(0 1.8 3n 0 0 20n 40n)
+VA1 A1 gnd 0
+VA2 A2 gnd 0
+VA3 A3 gnd pulse(0 1.8 3n 0 0 20n 40n)
+
+VB0 B0 gnd pulse(0 1.8 3n 0 0 20n 40n)
+VB1 B1 gnd 0
+VB2 B2 gnd 0
+VB3 B3 gnd pulse(0 1.8 3n 0 0 20n 40n)
+
+VC0 C0 gnd 0
+
+xdff1 A0_dff A0 clk vdd gnd flipflop
+xdff2 A1_dff A1 clk vdd gnd flipflop
+xdff3 A2_dff A2 clk vdd gnd flipflop
+xdff4 A3_dff A3 clk vdd gnd flipflop
+
+xdff5 B0_dff B0 clk vdd gnd flipflop
+xdff6 B1_dff B1 clk vdd gnd flipflop
+xdff7 B2_dff B2 clk vdd gnd flipflop
+xdff8 B3_dff B3 clk vdd gnd flipflop
+       
+* finding Pi's for each bit
+x1 P0 A0_dff B0_dff vdd gnd xor
+x2 P1 A1_dff B1_dff vdd gnd xor
+x3 P2 A2_dff B2_dff vdd gnd xor
+x4 P3 A3_dff B3_dff vdd gnd xor
+
+* finding Gi's for each bit
+x5 G0 A0_dff B0_dff vdd gnd and2
+x6 G1 A1_dff B1_dff vdd gnd and2
+x7 G2 A2_dff B2_dff vdd gnd and2
+x8 G3 A3_dff B3_dff vdd gnd and2
+
+* finding Ci's for each bit
+x9 w0 P0 C0 vdd gnd and2
+x10 C1 G0 w0 vdd gnd or2
+x11 w11 P1 P0 C0 vdd gnd and3
+x12 w12 P1 G0 vdd gnd and2
+x13 C2 G1 w11 w12 vdd gnd or3
+x14 w21 P2 P1 P0 C0 vdd gnd and4
+x15 w22 P2 P1 G0 vdd gnd and3
+x16 w23 P2 G1 vdd gnd and2
+x17 C3 G2 w21 w22 w23 vdd gnd or4
+x18 w31 P3 P2 P1 P0 C0 vdd gnd and5
+x19 w32 P3 P2 P1 G0 vdd gnd and4
+x20 w33 P3 P2 G1 vdd gnd and3
+x21 w34 P3 G2 vdd gnd and2
+x22 C4 G3 w31 w32 w33 w34 vdd gnd or5
+
+* finding Si's for each bit
+x17 S0_dff P0 C0 vdd gnd xor
+x18 S1_dff P1 C1 vdd gnd xor
+x19 S2_dff P2 C2 vdd gnd xor
+x20 S3_dff P3 C3 vdd gnd xor
+
+xdff9 S0 S0_dff clk vdd gnd flipflop
+xdff10 S1 S1_dff clk vdd gnd flipflop
+xdff11 S2 S2_dff clk vdd gnd flipflop
+xdff12 S3 S3_dff clk vdd gnd flipflop
+
+xdff13 Cout C4 clk vdd gnd flipflop
+
+.tran 0.01n 20n
+
+.control
+set hcopypscolor = 1 
+set color0=white 
+set color1=black 
+run
+plot v(S0) 2+V(S1) 4+V(S2) 6+V(S3) 8+V(Cout) 10+clk
+ 
+.endc
+
+
+
+ 
+
+ 
+
+
